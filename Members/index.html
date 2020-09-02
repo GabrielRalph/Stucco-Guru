@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Stucco Members</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <meta name="Stucco Members" content="Sydney University Student Cooperative member map">
+
+  <script src= "https://www.gstatic.com/firebasejs/7.14.4/firebase.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/ui/4.6.1/firebase-ui-auth.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+  <script src= "../config.js"></script>
+  <link type="text/css" href="https://fonts.hub.guru/fonts.css" />
+  <body>
+
+    <svg id = "loading"></svg>
+    <table id = "member-table">
+      <thead>
+        <tr>
+          <th>
+          </th>
+          <th>
+            <h1 @click = "setFilter">Firstname</h1><h1 @click = "setFilter" style = "padding-left: 20px">Lastname</h1>
+          </th>
+
+          <template v-if = "size == 'large'">
+            <th @click = "setFilter">
+              Status
+            </th>
+            <th @click = "setFilter">
+              Committee
+            </th>
+            <th style = "text-align:center; padding: 0" @click = "setFilter">
+              Unit
+            </th>
+          </template>
+          <th>
+          </th>
+        </tr>
+      </thead>
+      <tbody v-if = "users">
+        <tr v-for = "user in users">
+          <td>
+            <div :style = "`background-image: url('`+ user.dpURL +`')`"></div>
+          </td>
+          <td>
+            {{user.name}}
+          </td>
+
+          <template v-if = "size == 'large'">
+            <td>
+              {{user.status}}
+            </td>
+            <td>
+              {{user.committee == 'committee' ? '' : user.committee}}
+            </td>
+            <td style = "text-align:center; padding: 0">
+              {{user.unit > 0 ? user.unit : ''}}
+            </td>
+          </template>
+          <td>
+            ✎
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </body>
+
+  <script type="text/javascript">
+    let memberTable = new Vue({
+      el: '#member-table',
+      data: function(){
+        return {
+          size: 'small',
+          sortCursor: document.createElement('H1'),
+          sortMode: 'Firstname',
+          sortDirection: true,
+          myUsers: [],
+        }
+      },
+      methods: {
+        setFilter: function(event){
+          let sortMode = event.target.firstChild.data.replace(/( |\t|\n)*/g, '')
+          if (sortMode == this.sortMode){
+            this.sortDirection = !this.sortDirection;
+          }else{
+            this.sortMode = sortMode;
+            this.sortDirection = true;
+          }
+          this.sortCursor.innerHTML = this.sortDirection ? '🔼':'🔽'
+          event.target.appendChild(this.sortCursor)
+        },
+        addUser: function(user){
+          this.myUsers.push(user);
+        },
+        clearUsers: function(){
+          this.myUsers = [];
+        },
+        setUsers: function(users){
+          this.clearUsers()
+          users.forEach((user) => {
+            this.addUser(user)
+          });
+        },
+        sort(){
+
+          let order = (a,b) => {
+            if (a > b){
+              return this.sortDirection ? 1:-1
+            }else if(b > a){
+              return this.sortDirection ? -1:1
+            }else{
+              return 0;
+            }
+          }
+
+          let lexiSort = (a, b) => {
+            a = a.toLowerCase();
+            b = b.toLowerCase();
+            return order(a, b)
+          }
+          console.log(this.sortMode);
+          switch (this.sortMode) {
+
+            case 'Lastname':
+            console.log('l');
+              return this.myUsers.sort((a, b) => {
+                a = a.name;
+                b = b.name;
+                let a_s = a.split(' ')
+                if (a_s.length > 1){
+                  a = a_s[1];
+                }
+                let b_s = b.split(' ')
+                if (b_s.length > 1){
+                  b = b_s[1];
+                }
+
+                return lexiSort(a, b)
+              })
+
+            case 'Unit':
+            console.log('u');
+              return this.myUsers.sort((a, b) => {
+                a = parseInt(a.unit);
+                a = a == 0?100:a
+                b = parseInt(b.unit);
+                b = b == 0?100:b
+                return order(a, b)
+              })
+            case 'Committee':
+            console.log('c');
+
+              return this.myUsers.sort((a, b) => {
+                a = a.committee == 'committee' ? 'zzzzzz':a.committee
+                b = b.committee == 'committee' ? 'zzzzzz':b.committee
+                return lexiSort(a, b)
+              })
+            case 'Status':
+            console.log('s');
+
+              return this.myUsers.sort((a, b) => {
+                a = a.status;
+                b = b.status;
+                return lexiSort(a, b)
+              })
+            default:
+              console.log('d');
+
+              return this.myUsers.sort((a, b) => {
+                return lexiSort(a.name, b.name)
+              })
+
+          }
+        }
+      },
+      computed:{
+        users: function(){
+          if (this.myUsers != null){
+
+            return this.sort()
+          }else{
+            return false
+          }
+        }
+      },
+      created(){
+        window.onresize = () => {
+          this.size = (window.innerHeight/window.innerWidth > 1.3) ? 'small':'large'
+        }
+        window.onresize()
+        this.sortCursor.innerHTML = '🔼🔽'
+      },
+      mounted(){
+        this.sortCursor.style.setProperty('pointer-events', 'none')
+      }
+    })
+
+    let wave = new WaveLoader('loading');
+    wave.state = 'loading';
+
+    let fireAuth = new FireAuth();
+    fireAuth.watchState((user) => {
+      firebase.database().ref('/users').on('value', (sc) => {
+        let users_object = sc.val()
+        let users_array = []
+        for (var key in users_object){
+          let user = users_object[key];
+          if (user.name && user.dpURL){
+            users_array.push(user)
+          }
+        }
+        memberTable.setUsers(users_array)
+        wave.state = "loaded"
+      })
+    })
+
+
+  </script>
+
+  <style>
+    :root{
+      --row-height: 40px;
+      --border-rad: calc(0.5 * var(--row-height));
+      font-family: Guru Serif;
+    }
+    body{
+      padding: 20px;
+      background:#c5ecff;
+      /* background: url('https://cdn.wallpapersafari.com/2/76/ovUXz9.jpg') no-repeat center center fixed;
+      -webkit-background-size: cover;
+      -moz-background-size: cover;
+      -o-background-size: cover;
+      background-size: cover; */
+    }
+
+
+    table{
+      width: 100%;
+      border-spacing:4px 4px;
+    }
+
+    /* Table Row Style */
+    table tr{
+    }
+    table td, table th{
+      height: var(--row-height);
+      padding: 0;
+      text-align: left;
+      background: #50aad6;
+      color: rgb(240, 245, 255);
+      line-height: 30px;
+      cursor: pointer;
+      user-select: none;
+      border-radius: var(--border-rad);
+      padding-left: 10px;
+
+
+    }
+
+
+    /* First column */
+    table td:first-of-type, table th:first-of-type{
+      width: var(--row-height);
+      padding: 0;
+    }
+
+    /* Image div */
+    table td:first-of-type > div, table th:first-of-type > div{
+      background-repeat: no-repeat;
+      background-position: center center;
+      -webkit-background-size: cover;
+      -moz-background-size: cover;
+      -o-background-size: cover;
+      background-size: cover;
+      width: var(--row-height);
+      height: var(--row-height);
+      border-radius: var(--border-rad);
+    }
+
+    /* Last column */
+    table td:last-of-type, table th:last-of-type{
+      width: var(--row-height);
+      text-align: center;
+      padding: 0;
+    }
+
+    table h1{
+      margin: 0;
+      display: inline-block;
+      font-size: 16px;
+    }
+
+
+    #loading{
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #97ddff;
+    }
+
+    .wave{
+      fill: none;
+      stroke: white;
+      stroke-linecap: round;
+      stroke-width: 5;
+    }
+
+  </style>
+</html>
