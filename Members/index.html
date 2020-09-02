@@ -18,7 +18,8 @@
     <table id = "member-table">
       <thead>
         <tr>
-          <th>
+          <th style = "text-align: center" onclick = "window.location.assign('/')">
+            <
           </th>
           <th>
             <h1 @click = "setFilter">Firstname</h1><h1 @click = "setFilter" style = "padding-left: 20px">Lastname</h1>
@@ -44,34 +45,198 @@
           <td>
             <div :style = "`background-image: url('`+ user.dpURL +`')`"></div>
           </td>
-          <td>
+          <td @click = "edit(user)">
             {{user.name}}
           </td>
 
           <template v-if = "size == 'large'">
-            <td>
+            <td @click = "edit(user, 'status')">
               {{user.status}}
             </td>
-            <td>
+            <td @click = "edit(user, 'committee')">
               {{user.committee == 'committee' ? '' : user.committee}}
             </td>
-            <td style = "text-align:center; padding: 0">
+            <td style = "text-align:center; padding: 0" @click = "edit(user, 'unit')">
               {{user.unit > 0 ? user.unit : ''}}
             </td>
           </template>
-          <td>
+          <td @click = "edit(user)">
             ✎
           </td>
         </tr>
       </tbody>
     </table>
     <div id = "edit-panel">
-      <template id = "edit-panel-vue">
-      </template>
+      <div id = "edit-panel-vue">
+        <div class = "close" @click = "close()">
+          X
+        </div>
+        <div  v-if = "!select_option" class = "close" style = "top: 70px" @click = "save()">
+          S
+        </div>
+        <table v-if = "!select_option">
+          <tr>
+            <td>
+              Fullname
+            </td>
+            <td>
+              <input id = "name" type = "text" v-model = "name"/>
+            </td>
+          </tr>
+          <tr>
+            <td @click = "selectOption('committee')">
+              Committee <span>✎</span>
+            </td>
+            <td>
+              {{committee}}
+            </td>
+          </tr>
+          <tr>
+            <td @click = "selectOption('status')">
+              Status <span>✎</span>
+            </td>
+            <td>
+              {{status}}
+            </td>
+          </tr>
+          <tr>
+            <td @click = "selectOption('unit')">
+              Unit <span>✎</span>
+            </td>
+            <td>
+              {{unit != 0?unit:''}}
+            </td>
+          </tr>
+          <tr>
+            <td @click = "selectOption('duties')">
+              Duties <span>+</span>
+            </td>
+            <td>
+              <div class = "duties" v-for = "(on, dutie) in duties" v-if = "on">
+                <span>
+                  {{dutie}}
+                </span>
+                <div @click = "duties[dutie] = false">
+                  x
+                </div>
+              </div>
+            </td>
+          </tr>
+        </table>
+        <div class = "options" v-else>
+          <div class = "option" v-for = "option in options" @click = "setOption(option)">
+            {{option}}
+          </div>
+        </div>
+      </div>
     </div>
   </body>
 
   <script type="text/javascript">
+    class EditPanel{
+      constructor(el){
+        this.el = parseElement(el);
+        let me = this;
+        this.editPanel = new Vue({
+          el: '#' + el + '-vue',
+          data: function(){
+            return {
+              mgmt: me,
+              select_option:false,
+              field: null,
+              opts: {
+                committee: ['BDSM', 'Finance', 'Membership', 'PandA'],
+                status: ['vip', 'resident', 'applicant', 'ex-resident', 'utility', 'duplicate', 'delete'],
+                duties: ['Attendance Officer', 'Bond Officer', 'Key Master', 'Rent Officer'],
+                unit: [1,2,3,4,5,6,7,8]
+              },
+              name: '',
+              committee: '',
+              status: '',
+              unit: '',
+              uid: '',
+              duties: {}
+            }
+          },
+          methods: {
+            close: function(){
+              if (this.select_option){
+                this.select_option = false;
+              }else{
+                this.mgmt.on = false;
+              }
+            },
+            setOption: function(option){
+              if (this.field == 'duties'){
+                this.duties[option] = true
+              }else{
+                this[this.field] = option;
+              }
+              this.close()
+            },
+            selectOption: function(opt){
+              this.field = opt;
+              this.select_option = true;
+            },
+            save: function(){
+              let db = (key) => { return firebase.database().ref(`users/${this.uid}/${key}`) }
+              db('name').set(this.name)
+              db('committee').set(this.committee)
+              db('status').set(this.status)
+              db('unit').set(this.unit)
+              db('duties').set(this.duties)
+              this.close()
+            }
+          },
+          computed: {
+            options: function(){
+              if (this.field != null){
+                return this.opts[this.field]
+              }
+              return null
+            }
+          }
+        })
+
+        this.on = false;
+      }
+      set user(user){
+        this.editPanel.name = user.name;
+        this.editPanel.committee = user.committee;
+        this.editPanel.status = user.status;
+        this.editPanel.unit = user.unit;
+        this.editPanel.duties = user.duties;
+        this.editPanel.uid = user.uid;
+      }
+      get user(){
+        return {name: this.editPanel.name,committee: this.editPanel.committee,unit: this.editPanel.unit,status: this.editPanel.status,duties: this.editPanel.duties,uid: this.editPanel.uid}
+      }
+      set on(value){
+        let blur = (start, end, inc, onend = null) => {
+          start += inc;
+          if ((start <= end && inc > 0)||(start >= end && inc < 0)){
+            this.el.style.setProperty('backdrop-filter', `blur(${start}px)`);
+            this.el.style.setProperty('opacity', `${start/20}`);
+
+            window.requestAnimationFrame(() => {blur(start, end, inc, onend)})
+          }else if (onend instanceof Function){
+            onend()
+          }
+        }
+        // this.el.style.setProperty('transition', `${this.animation_delay/1000}s ease-in`)
+        if (value){
+          this.el.style.setProperty('display', 'block')
+          let max = 20;
+          window.requestAnimationFrame(() => {blur(0, 20, 1)})
+        }else{
+          window.requestAnimationFrame(() => {blur(20, 0, -1, () => {
+            this.el.style.setProperty('display', 'none')
+          })})
+        }
+      }
+    }
+
+
     let memberTable = new Vue({
       el: '#member-table',
       data: function(){
@@ -81,6 +246,7 @@
           sortMode: 'Firstname',
           sortDirection: true,
           myUsers: [],
+          editPanel: new EditPanel('edit-panel')
         }
       },
       methods: {
@@ -177,6 +343,13 @@
               })
 
           }
+        },
+        edit: function(user, value = null){
+          this.editPanel.user = user;
+          this.editPanel.on = !this.editPanel.on;
+          if (value != null){
+            this.editPanel.editPanel.selectOption(value)
+          }
         }
       },
       computed:{
@@ -200,40 +373,7 @@
         this.sortCursor.style.setProperty('pointer-events', 'none')
       }
     })
-    class EditPanel{
-      constructor(el){
-        this.el = parseElement(el);
-        this.animation_delay = 300;
-        this.editPanel = new Vue({
-          el: '#' + el + '-vue',
-          data: function(){
-            return {
-              opts: {
-                committees: ['BDSM', 'Finance', 'Membership', 'PandA'],
-                status: ['vip', 'resident', 'applicant', 'ex-resident', 'utility', 'duplicate', 'delete'],
-                duties: ['Attendance Officer', 'Bond Officer', 'Key Master', 'Rent Officer']
-              }
-            }
-          },
-        })
-        this.on = false;
-      }
-      set on(value){
-        console.log(this.el);
-        this.el.style.setProperty('transition', `${this.animation_delay/1000}s ease-in backdrop-filter`)
-        if (value){
-          this.el.style.setProperty('display', 'block')
-          this.el.style.setProperty('backdrop-filter', `blur(25px)`)
-        }else{
-          this.el.style.setProperty('backdrop-filter', `blur(0px)`);
-          setTimeout(() => {
-            this.el.style.setProperty('display', 'none')
-          }, this.animation_delay);
-        }
-      }
-    }
-    let editPanel = new EditPanel('edit-panel');
-    editPanel.on = true;
+
     let wave = new WaveLoader('loading');
     wave.state = 'loading';
 
@@ -273,15 +413,15 @@
     }
 
 
-    table{
+    #member-table{
       width: 100%;
       border-spacing:4px 4px;
     }
 
     /* Table Row Style */
-    table tr{
+    #member-table tr{
     }
-    table td, table th{
+    #member-table td, #member-table th{
       height: var(--row-height);
       padding: 0;
       text-align: left;
@@ -298,13 +438,13 @@
 
 
     /* First column */
-    table td:first-of-type, table th:first-of-type{
+    #member-table td:first-of-type, #member-table th:first-of-type{
       width: var(--row-height);
       padding: 0;
     }
 
     /* Image div */
-    table td:first-of-type > div, table th:first-of-type > div{
+    #member-table td:first-of-type > div, #member-table th:first-of-type > div{
       background-repeat: no-repeat;
       background-position: center center;
       -webkit-background-size: cover;
@@ -317,13 +457,13 @@
     }
 
     /* Last column */
-    table td:last-of-type, table th:last-of-type{
+    #member-table td:last-of-type, #member-table th:last-of-type{
       width: var(--row-height);
       text-align: center;
       padding: 0;
     }
 
-    table h1{
+    #member-table h1{
       margin: 0;
       display: inline-block;
       font-size: 16px;
@@ -332,6 +472,7 @@
 
     #loading{
       position: fixed;
+      z-index: 10;
       top: 0;
       bottom: 0;
       left: 0;
@@ -352,7 +493,107 @@
       bottom: 0;
       left: 0;
       right: 0;
+      padding: 20px;
     }
+    #edit-panel tr > td:first-of-type{
+      border-radius: 30px 0 0 30px;
+      border: 3px solid white;
+    }
+    #edit-panel tr > td:last-of-type{
+      border-radius: 0 30px 30px 0;
+      border: 3px solid white;
+      border-left: 0;
+    }
+
+    #edit-panel{
+      color: white;
+    }
+
+    #edit-panel table td{
+      height: var(--row-height);
+      padding: 0 20px;
+    }
+    #edit-panel table{
+      margin:auto;
+      margin-top: 100px;
+      border-spacing: 0px 10px;
+    }
+    #edit-panel tr td:first-of-type{
+      cursor: pointer;
+    }
+    #edit-panel tr td:first-of-type span{
+      float: left;
+      padding-right: 10px;
+    }
+    #edit-panel input{
+      color: white;
+      font-size: 16px;
+      border: none;
+      background: transparent;
+      font-family: Guru Serif;
+      /* margin-bottom: 20px; */
+      outline: none;
+      /* line-height: var(--row-height); */
+      /* height: 100%; */
+    }
+    .close{
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      color: white;
+      text-align: center;
+      line-height: 26px;
+      padding-top: 4px;
+      height: 26px;
+      width: 30px;
+      border-radius: 30px;
+      border: 3px solid white;
+      color: white;
+      user-select: none;
+      cursor: pointer;
+    }
+    .options > div{
+      width: 150px;
+      border: 3px solid white;
+      padding: 10px;
+      text-align: center;
+      margin-top: 20px;
+      border-radius: 30px;
+    }
+    .options{
+      cursor: pointer;
+      margin: auto;
+      width: 150px;
+      margin-top: 100px;
+    }
+    .duties{
+      background: #3497c7;
+      padding: 5px;
+      float: left;
+      border-radius: 30px;
+      margin-left: 10px;
+      margin-top: 3px;
+      margin-bottom: 3px;
+    }
+    .duties span{
+      float: left;
+      margin: 0 10px;
+      line-height: 22px;
+    }
+    .duties div{
+      float: left;
+      background: #d26060;
+      width: 20px;
+      height: 18px;
+      border-radius: 10px;
+      line-height: 18px;
+      padding-top: 2px;
+      user-select: none;
+      cursor: pointer;
+      text-align: center;
+    }
+
+
 
   </style>
 </html>
