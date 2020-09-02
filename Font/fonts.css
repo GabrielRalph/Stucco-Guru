@@ -1,0 +1,35 @@
+@font-face {
+    font-family: 'Guru Bold';
+    src: url('https://fonts.hub.guru/subset-Guru-Regular.eot');
+    src: url('https://fonts.hub.guru/subset-Guru-Regular.eot?#iefix') format('embedded-opentype'),
+        url('https://fonts.hub.guru/subset-Guru-Regular.woff2') format('woff2'),
+        url('https://fonts.hub.guru/subset-Guru-Regular.woff') format('woff'),
+        url('https://fonts.hub.guru/subset-Guru-Regular.svg#Guru-Regular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+
+@font-face {
+    font-family: 'Guru Sans';
+    src: url('https://fonts.hub.guru/GuruSans-Regular.eot');
+    src: url('https://fonts.hub.guru/GuruSans-Regular.eot?#iefix') format('embedded-opentype'),
+        url('https://fonts.hub.guru/GuruSans-Regular.woff2') format('woff2'),
+        url('https://fonts.hub.guru/GuruSans-Regular.woff') format('woff'),
+        url('https://fonts.hub.guru/GuruSans-Regular.ttf') format('truetype'),
+        url('https://fonts.hub.guru/GuruSans-Regular.svg#GuruSans-Regular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Guru Serif';
+    src: url('https://fonts.hub.guru/GuruSerif-Regular.eot');
+    src: url('https://fonts.hub.guru/GuruSerif-Regular.eot?#iefix') format('embedded-opentype'),
+        url('https://fonts.hub.guru/GuruSerif-Regular.woff2') format('woff2'),
+        url('https://fonts.hub.guru/GuruSerif-Regular.woff') format('woff'),
+        url('https://fonts.hub.guru/GuruSerif-Regular.ttf') format('truetype'),
+        url('https://fonts.hub.guru/GuruSerif-Regular.svg#GuruSerif-Regular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
