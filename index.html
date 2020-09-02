@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Stucco</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <meta name="Stucco Members" content="Sydney University Student Cooperative member map">
+
+  <script src= "https://www.gstatic.com/firebasejs/7.14.4/firebase.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/ui/4.6.1/firebase-ui-auth.js"></script>
+  <script src= "../config.js"></script>
+  <link type="text/css" href="https://fonts.hub.guru/fonts.css" />
+
+  <body>
+    <svg id = "loading"></svg>
+  </body>
+
+  <script type="text/javascript">
+    let options = {
+      resident: ['Members', 'Attendance'],
+      'Rent Officer': ['Rent'],
+      'Bond Officer': ['Bond']
+    }
+    let colors = {
+      Members: '#50aad6',
+      Attendance: '#f77a3f',
+      Rent: '#5957ff',
+      Bond: '#77a936'
+    }
+
+    let wave = new WaveLoader('loading');
+    wave.state = 'loading';
+
+    let fireAuth = new FireAuth();
+    fireAuth.watchState((_user) => {
+      firebase.database().ref('/users/' + _user.uid).on('value', (sc) => {
+        let links = [];
+        let user = sc.val();
+
+        if (user.status && options[user.status]){
+          links = links.concat(options[user.status])
+        }
+        if (user.committee && options[user.comittee]){
+          links = links.concat(options[user.committee])
+        }
+        if (user.duties){
+          for (var key in user.duties){
+            if (user.duties[key] && options[user.duties[key]]){
+              links = links.concat(options[user.duties[key]])
+            }
+          }
+        }
+        links.forEach((link) => {
+          let link_el = document.createElement('H1');
+          link_el.onclick = () => {window.location.assign(`/${link}`)};
+          link_el.innerHTML = link;
+          link_el.style.setProperty('background', colors[link])
+          document.body.appendChild(link_el)
+        });
+
+        wave.state = "loaded"
+      })
+    })
+
+
+  </script>
+  <style>
+  body{
+    font-family: Guru Serif;
+  }
+  h1 {
+    text-align: center;
+    width: 200px;
+    padding: 10px;
+    border-radius: 30px;
+    color: white;
+    margin: 20px auto;
+    user-select: none;
+    cursor: pointer;
+  }
+  body > h1:first-of-type{
+    margin-top: 100px;
+  }
+    #loading{
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #97ddff;
+    }
+
+    .wave{
+      fill: none;
+      stroke: white;
+      stroke-linecap: round;
+      stroke-width: 5;
+    }
+  </style>
+
+</html>

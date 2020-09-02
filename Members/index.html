@@ -65,6 +65,10 @@
         </tr>
       </tbody>
     </table>
+    <div id = "edit-panel">
+      <template id = "edit-panel-vue">
+      </template>
+    </div>
   </body>
 
   <script type="text/javascript">
@@ -196,7 +200,40 @@
         this.sortCursor.style.setProperty('pointer-events', 'none')
       }
     })
-
+    class EditPanel{
+      constructor(el){
+        this.el = parseElement(el);
+        this.animation_delay = 300;
+        this.editPanel = new Vue({
+          el: '#' + el + '-vue',
+          data: function(){
+            return {
+              opts: {
+                committees: ['BDSM', 'Finance', 'Membership', 'PandA'],
+                status: ['vip', 'resident', 'applicant', 'ex-resident', 'utility', 'duplicate', 'delete'],
+                duties: ['Attendance Officer', 'Bond Officer', 'Key Master', 'Rent Officer']
+              }
+            }
+          },
+        })
+        this.on = false;
+      }
+      set on(value){
+        console.log(this.el);
+        this.el.style.setProperty('transition', `${this.animation_delay/1000}s ease-in backdrop-filter`)
+        if (value){
+          this.el.style.setProperty('display', 'block')
+          this.el.style.setProperty('backdrop-filter', `blur(25px)`)
+        }else{
+          this.el.style.setProperty('backdrop-filter', `blur(0px)`);
+          setTimeout(() => {
+            this.el.style.setProperty('display', 'none')
+          }, this.animation_delay);
+        }
+      }
+    }
+    let editPanel = new EditPanel('edit-panel');
+    editPanel.on = true;
     let wave = new WaveLoader('loading');
     wave.state = 'loading';
 
@@ -307,6 +344,14 @@
       stroke: white;
       stroke-linecap: round;
       stroke-width: 5;
+    }
+
+    #edit-panel{
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
     }
 
   </style>
