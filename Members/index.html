@@ -217,6 +217,7 @@
           if ((start <= end && inc > 0)||(start >= end && inc < 0)){
             this.el.style.setProperty('backdrop-filter', `blur(${start}px)`);
             this.el.style.setProperty('-webkit-backdrop-filter', `blur(${start}px)`);
+            this.el.style.setProperty('background', `rgba(80, 170, 214, ${start/50})`);
             this.el.style.setProperty('opacity', `${start/20}`);
 
             window.requestAnimationFrame(() => {blur(start, end, inc, onend)})
