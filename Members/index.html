@@ -85,17 +85,17 @@
           </tr>
           <tr>
             <td @click = "selectOption('committee')">
-              Committee <span>✎</span>
+              Committee
             </td>
-            <td>
+            <td @click = "selectOption('status')">
               {{committee}}
             </td>
           </tr>
           <tr>
             <td @click = "selectOption('status')">
-              Status <span>✎</span>
+              Status
             </td>
-            <td>
+            <td @click = "selectOption('status')">
               {{status}}
             </td>
           </tr>
@@ -103,7 +103,7 @@
             <td @click = "selectOption('unit')">
               Unit <span>✎</span>
             </td>
-            <td>
+            <td @click = "selectOption('status')">
               {{unit != 0?unit:''}}
             </td>
           </tr>
@@ -529,6 +529,9 @@
     #edit-panel tr td:first-of-type span{
       float: left;
       padding-right: 10px;
+    }
+    #edit-panel td{
+      max-width: 70%;
     }
     #edit-panel input{
       color: white;
