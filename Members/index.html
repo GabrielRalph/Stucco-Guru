@@ -75,14 +75,14 @@
           S
         </div>
         <table v-if = "!select_option">
-          <tr>
+          <!-- <tr>
             <td>
               Fullname
             </td>
             <td>
               <input id = "name" type = "text" v-model = "name"/>
             </td>
-          </tr>
+          </tr> -->
           <tr>
             <td @click = "selectOption('committee')">
               Committee
@@ -107,21 +107,21 @@
               {{unit != 0?unit:''}}
             </td>
           </tr>
-          <tr>
+          <!-- <tr>
             <td @click = "selectOption('duties')">
               Duties <span>+</span>
             </td>
             <td>
-              <!-- <div class = "duties" v-for = "(on, dutie) in duties" v-if = "on">
+              <div class = "duties" v-for = "(on, dutie) in duties" v-if = "on">
                 <span>
                   {{dutie}}
                 </span>
                 <div @click = "duties[dutie] = false">
                   x
                 </div>
-              </div> -->
+              </div>
             </td>
-          </tr>
+          </tr> -->
         </table>
         <div class = "options" v-else>
           <div class = "option" v-for = "option in options" @click = "setOption(option)">
