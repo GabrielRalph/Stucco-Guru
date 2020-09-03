@@ -107,7 +107,7 @@
               {{unit != 0?unit:''}}
             </td>
           </tr>
-          <!-- <tr>
+          <tr>
             <td @click = "selectOption('duties')">
               Duties <span>+</span>
             </td>
@@ -121,7 +121,7 @@
                 </div>
               </div>
             </td>
-          </tr> -->
+          </tr>
         </table>
         <div class = "options" v-else>
           <div class = "option" v-for = "option in options" @click = "setOption(option)">
@@ -489,62 +489,64 @@
       stroke-linecap: round;
       stroke-width: 5;
     }
+    /* Edit Panel */
+      #edit-panel{
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 20px;
+      }
+      #edit-panel tr > td:first-of-type{
+        border-radius: 30px 0 0 30px;
+        border: 3px solid white;
+      }
+      #edit-panel tr > td:last-of-type{
+        border-radius: 0 30px 30px 0;
+        border: 3px solid white;
+        border-left: 0;
+      }
 
-    #edit-panel{
-      position: fixed;
-      top: 0;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      padding: 20px;
-    }
-    #edit-panel tr > td:first-of-type{
-      border-radius: 30px 0 0 30px;
-      border: 3px solid white;
-    }
-    #edit-panel tr > td:last-of-type{
-      border-radius: 0 30px 30px 0;
-      border: 3px solid white;
-      border-left: 0;
-    }
+      #edit-panel{
+        color: white;
+      }
 
-    #edit-panel{
-      color: white;
-    }
+      #edit-panel table td{
+        height: var(--row-height);
+        padding: 0 20px;
+      }
+      #edit-panel table{
+        max-width: calc(100vw - 2* 20px);
+        background-color: green;
+        margin:auto;
+        margin-top: 50px;
+        border-spacing: 0px 10px;
+        overflow: hidden;
+      }
+      #edit-panel tr td:first-of-type{
+        cursor: pointer;
+      }
+      #edit-panel tr td:first-of-type span{
+        float: left;
+        padding-right: 10px;
+      }
+      #edit-panel td{
+        max-width: 70%;
+      }
+      #edit-panel input{
+        color: white;
+        font-size: 16px;
+        border: none;
+        padding: 0;
+        margin: 0;
+        float: left;
+        background: transparent;
+        font-family: Guru Serif;
+        outline: none;
+      }
 
-    #edit-panel table td{
-      height: var(--row-height);
-      padding: 0 20px;
-    }
-    #edit-panel table{
-      max-width: calc(100vw - 2* 20px);
-      background-color: green;
-      margin:auto;
-      margin-top: 100px;
-      border-spacing: 0px 10px;
-      overflow: hidden;
-    }
-    #edit-panel tr td:first-of-type{
-      cursor: pointer;
-    }
-    #edit-panel tr td:first-of-type span{
-      float: left;
-      padding-right: 10px;
-    }
-    #edit-panel td{
-      max-width: 70%;
-    }
-    #edit-panel input{
-      color: white;
-      font-size: 16px;
-      border: none;
-      padding: 0;
-      margin: 0;
-      float: left;
-      background: transparent;
-      font-family: Guru Serif;
-      outline: none;
-    }
+      /* Buttons */
     .close{
       position: fixed;
       top: 20px;
