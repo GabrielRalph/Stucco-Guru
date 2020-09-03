@@ -14,6 +14,12 @@
 
   <body>
     <svg id = "loading"></svg>
+    <div class = "x">
+      <div id = "apps">
+
+      </div>
+
+    </div>
   </body>
 
   <script type="text/javascript">
@@ -52,12 +58,16 @@
           }
         }
         links = ['Members'] //Until its all finished
+        let apps = document.getElementById('apps')
         links.forEach((link) => {
           let link_el = document.createElement('H1');
-          link_el.onclick = () => {window.location.assign(`/${link}`)};
+          link_el.onclick = () => {
+            console.log(link);
+            window.location.assign(`/${link}`)
+          };
           link_el.innerHTML = link;
           link_el.style.setProperty('background', colors[link])
-          document.body.appendChild(link_el)
+          apps.appendChild(link_el)
         });
 
         wave.state = "loaded"
@@ -71,6 +81,18 @@
 
   body{
     font-family: Guru Serif;
+    margin: 0;
+  }
+  .x{
+    position: fixed;
+    top:0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
   }
   h1 {
     text-align: center;
@@ -78,7 +100,6 @@
     padding: 10px;
     border-radius: 30px;
     color: white;
-    margin: 20px auto;
     user-select: none;
     cursor: pointer;
   }

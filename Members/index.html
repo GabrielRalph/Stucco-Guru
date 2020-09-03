@@ -45,7 +45,7 @@
           <td>
             <div :style = "`background-image: url('`+ user.dpURL +`')`"></div>
           </td>
-          <td @click = "edit(user)">
+          <td @click = "edit(user, 'name')">
             {{user.name}}
           </td>
 
@@ -69,17 +69,17 @@
     <div id = "edit-panel">
       <div id = "edit-panel-vue">
         <div class = "close" @click = "close()">
-          X
+          {{field == 'name'&&select_option?'s':'x'}}
         </div>
         <div  v-if = "!select_option" class = "close" style = "top: 70px" @click = "save()">
-          S
+          s
         </div>
         <table v-if = "!select_option">
           <tr>
-            <td>
+            <td @click = "selectOption('name')">
               Fullname
             </td>
-            <td>
+            <td @click = "selectOption('name')">
               {{name}}
             </td>
           </tr>
@@ -87,7 +87,7 @@
             <td @click = "selectOption('committee')">
               Committee
             </td>
-            <td @click = "selectOption('status')">
+            <td @click = "selectOption('committee')">
               {{committee}}
             </td>
           </tr>
@@ -103,7 +103,7 @@
             <td @click = "selectOption('unit')">
               Unit
             </td>
-            <td @click = "selectOption('status')">
+            <td @click = "selectOption('unit')">
               {{unit != 0?unit:''}}
             </td>
           </tr>
@@ -124,8 +124,12 @@
           </tr>
         </table>
         <div class = "options" v-else>
-          <div class = "option" v-for = "option in options" @click = "setOption(option)">
+          <h1>{{field}}</h1>
+          <div v-if = "field != 'name'" class = "option" v-for = "option in options" @click = "setOption(option)">
             {{option}}
+          </div>
+          <div v-if = "field == 'name'">
+              <input v-model = "name"/>
           </div>
         </div>
       </div>
@@ -496,7 +500,19 @@
         bottom: 0;
         left: 0;
         right: 0;
-        padding: 20px;
+        color: white;
+      }
+      #edit-panel-vue{
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
       }
       #edit-panel tr > td:first-of-type{
         border-radius: 30px 0 0 30px;
@@ -508,19 +524,12 @@
         border-left: 0;
       }
 
-      #edit-panel{
-        color: white;
-      }
-
       #edit-panel table td{
         height: var(--row-height);
         padding: 0 20px;
       }
       #edit-panel table{
         max-width: calc(100vw - 2* 20px);
-        background-color: green;
-        margin:auto;
-        margin-top: 50px;
         border-spacing: 0px 10px;
         overflow: hidden;
       }
@@ -537,10 +546,8 @@
       #edit-panel input{
         color: white;
         font-size: 16px;
+        padding-right: 20px;
         border: none;
-        padding: 0;
-        margin: 0;
-        float: left;
         background: transparent;
         font-family: Guru Serif;
         outline: none;
@@ -564,18 +571,18 @@
       cursor: pointer;
     }
     .options > div{
-      width: 150px;
+      /* width: 150px; */
       border: 3px solid white;
       padding: 10px;
       text-align: center;
-      margin-top: 20px;
+      margin-bottom: 20px;
       border-radius: 30px;
     }
     .options{
-      cursor: pointer;
-      margin: auto;
-      width: 150px;
-      margin-top: 100px;
+      /* cursor: pointer; */
+      /* margin: auto; */
+      /* width: 150px; */
+      /* margin-top: 100px; */
     }
     .duties{
       background: #3497c7;
